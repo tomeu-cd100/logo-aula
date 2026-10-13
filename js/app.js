@@ -2,6 +2,7 @@ import { createStream, askDialog, writeError } from './output.js';
 import { createRunner } from './runner.js';
 import { startSprite } from './sprite.js';
 import { startStatus } from './status.js';
+import { installSpeed } from './speed.js';
 import { DEFAULT_CELL, parseCellParam, drawGrid } from './grid.js';
 
 const SIZE = 600;
@@ -25,8 +26,14 @@ sprite.src = 'img/tortuga.svg';
 startSprite($('#turtle').getContext('2d'), turtle, sprite, SIZE);
 startStatus($('#estat'), turtle);
 
-const prefs = { cel: DEFAULT_CELL, quadricula: true };
+const prefs = { cel: DEFAULT_CELL, quadricula: true, velocitat: 0 };
 prefs.cel = parseCellParam(location.search) ?? prefs.cel;
+
+installSpeed(turtle, () => prefs.velocitat);
+$('#velocitat').value = String(prefs.velocitat);
+$('#velocitat').addEventListener('input', e => {
+  prefs.velocitat = Number(e.target.value);
+});
 
 const gridCtx = $('#grid').getContext('2d');
 function redrawGrid() {
