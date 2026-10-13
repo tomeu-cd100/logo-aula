@@ -1,0 +1,12 @@
+LOGO a l'aula
+Copyright 2026 Consell de Cent
+
+Aquest projecte inclou "Logo in Javascript" (jslogo)
+Copyright (C) 2009-2013 Joshua Bell
+https://github.com/inexorabletash/jslogo
+Llicència Apache 2.0. Fitxers a vendor/jslogo/, sense modificar
+(commit 26dfcac41daa4477182ce7c1a00acbd913ab5fd5).
+
+Inclou CodeMirror 5.61.1 (MIT) a vendor/codemirror/.
+
+Fitxers propis: index.html, css/, js/, img/, manual/, tests/.

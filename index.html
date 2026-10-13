@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LOGO a l'aula</title>
+<link rel="stylesheet" href="vendor/codemirror/codemirror.min.css">
+<link rel="stylesheet" href="vendor/jslogo/cm/logo.css">
+<link rel="stylesheet" href="css/app.css">
+<script src="vendor/codemirror/codemirror.min.js"></script>
+<script src="vendor/codemirror/closebrackets.min.js"></script>
+<script src="vendor/codemirror/matchbrackets.min.js"></script>
+<script src="vendor/jslogo/cm/logo.js"></script>
+<script src="vendor/jslogo/floodfill.js"></script>
+<script src="vendor/jslogo/logo.js"></script>
+<script src="vendor/jslogo/turtle.js"></script>
+<script type="module" src="js/app.js"></script>
+</head>
+<body>
+<div id="avis-desat" class="avis" hidden>La feina no es desarà en tancar.</div>
+<main class="app">
+  <section class="tela-panell" aria-label="Tela">
+    <div class="barra">
+      <button id="executa" type="button">▶ Executa</button>
+      <button id="atura" type="button" disabled>■ Atura</button>
+      <button id="neteja" type="button">Neteja</button>
+      <label>Cel·la
+        <select id="cel">
+          <option value="10">10</option>
+          <option value="20" selected>20</option>
+          <option value="50">50</option>
+        </select>
+      </label>
+      <label><input type="checkbox" id="quadricula" checked> Quadrícula</label>
+      <label>Velocitat <input type="range" id="velocitat" min="0" max="5" step="1" value="0"></label>
+    </div>
+    <div class="tela" id="tela">
+      <canvas id="grid" width="600" height="600"></canvas>
+      <canvas id="sandbox" width="600" height="600"></canvas>
+      <canvas id="turtle" width="600" height="600"></canvas>
+    </div>
+    <div id="estat" class="estat"></div>
+    <form id="ordres" class="ordres" autocomplete="off">
+      <span aria-hidden="true">?</span>
+      <input id="ordre" type="text" spellcheck="false" aria-label="Línia d'ordres" placeholder="FD 50">
+    </form>
+  </section>
+  <section class="panells" aria-label="Panells">
+    <div class="pestanyes" role="tablist">
+      <button type="button" role="tab" data-pestanya="editor" aria-selected="true">Editor</button>
+      <button type="button" role="tab" data-pestanya="historial" aria-selected="false">Historial</button>
+      <button type="button" role="tab" data-pestanya="manual" aria-selected="false">Manual</button>
+    </div>
+    <div class="pestanya" id="pestanya-editor">
+      <textarea id="editor"></textarea>
+      <div class="sortida-cap">Sortida <button id="buida-sortida" type="button">Buida</button></div>
+      <pre id="sortida" class="sortida"></pre>
+      <div class="fitxers">
+        <button id="desa-lgo" type="button">💾 Desa .lgo</button>
+        <button id="obre-lgo" type="button">📂 Obre .lgo</button>
+        <input type="file" id="fitxer-lgo" accept=".lgo,.txt,text/plain" hidden>
+        <button id="desa-png" type="button">🖼 Desa PNG</button>
+      </div>
+    </div>
+    <div class="pestanya" id="pestanya-historial" hidden>
+      <ol id="historial" class="historial"></ol>
+      <button id="esborra-tot" type="button" class="perill">Esborra-ho tot</button>
+    </div>
+    <div class="pestanya" id="pestanya-manual" hidden>
+      <input id="cerca-manual" type="search" placeholder="Cerca una primitiva…" aria-label="Cerca una primitiva">
+      <div id="manual"></div>
+    </div>
+  </section>
+</main>
+<dialog id="lectura">
+  <form method="dialog">
+    <p></p>
+    <input type="text" aria-label="Resposta">
+    <button value="ok">D'acord</button>
+  </form>
+</dialog>
+</body>
+</html>
