@@ -60,7 +60,7 @@
 
   { "categoria": "Text i sortida", "nom": "print", "abreviatures": ["pr"], "sintaxi": "PRINT cosa", "descripcio": "Escriu a la Sortida i salta de línia. Les llistes surten sense claudàtors.", "exemple": "PRINT [Hola, món!]" },
   { "categoria": "Text i sortida", "nom": "show", "abreviatures": [], "sintaxi": "SHOW cosa", "descripcio": "Com PRINT, però les llistes surten amb claudàtors.", "exemple": "SHOW [1 2 3]" },
-  { "categoria": "Text i sortida", "nom": "type", "abreviatures": [], "sintaxi": "TYPE cosa", "descripcio": "Escriu sense saltar de línia.", "exemple": "TYPE \"Hola TYPE \"| | PRINT \"món" },
+  { "categoria": "Text i sortida", "nom": "type", "abreviatures": [], "sintaxi": "TYPE cosa", "descripcio": "Escriu sense saltar de línia.", "exemple": "REPEAT 5 [TYPE \"*]\nPRINT \"!" },
   { "categoria": "Text i sortida", "nom": "readword", "abreviatures": [], "sintaxi": "READWORD", "descripcio": "Demana a l'usuari que escrigui una paraula.", "exemple": "MAKE \"nom READWORD\nPRINT SE [Hola] :nom" },
   { "categoria": "Text i sortida", "nom": "readlist", "abreviatures": [], "sintaxi": "READLIST", "descripcio": "Demana a l'usuari una frase i la retorna com a llista.", "exemple": "SHOW READLIST" }
 ]
