@@ -6,6 +6,7 @@ import { installSpeed } from './speed.js';
 import { addEntry, createRecall, renderHistory } from './history.js';
 import { setupTabs } from './tabs.js';
 import { createStore, debounce } from './store.js';
+import { filterPrimitives, renderManual } from './manual.js';
 import { LGO_NAME, PNG_NAME, isProbablyText, downloadText, downloadDataUrl, composePng } from './files.js';
 import { DEFAULT_CELL, parseCellParam, drawGrid } from './grid.js';
 
@@ -182,6 +183,20 @@ $('#fitxer-lgo').addEventListener('change', async e => {
 });
 $('#desa-png').addEventListener('click', () =>
   downloadDataUrl(PNG_NAME, composePng($('#grid'), $('#sandbox'))));
+
+function tryExample(code) {
+  if (!replaceEditor(code)) return;
+  $('[data-pestanya="editor"]').click();
+}
+
+try {
+  const primitives = await (await fetch('manual/primitives.json')).json();
+  const showManual = () => renderManual($('#manual'), filterPrimitives(primitives, $('#cerca-manual').value), tryExample);
+  $('#cerca-manual').addEventListener('input', showManual);
+  showManual();
+} catch {
+  $('#manual').textContent = "No s'ha pogut carregar el manual.";
+}
 
 window.logoApp = { logo, turtle, editor };
 window.logoApp.ready = true;
