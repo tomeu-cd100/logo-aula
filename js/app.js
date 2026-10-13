@@ -5,10 +5,16 @@ import { startStatus } from './status.js';
 import { installSpeed } from './speed.js';
 import { addEntry, createRecall, renderHistory } from './history.js';
 import { setupTabs } from './tabs.js';
+import { createStore, debounce } from './store.js';
 import { DEFAULT_CELL, parseCellParam, drawGrid } from './grid.js';
 
 const SIZE = 600;
 const $ = sel => document.querySelector(sel);
+
+const store = createStore((() => {
+  try { return window.localStorage; } catch { return null; }
+})());
+$('#avis-desat').hidden = store.available;
 
 const sortida = $('#sortida');
 const stream = createStream(sortida, askDialog);
@@ -28,13 +34,15 @@ sprite.src = 'img/tortuga.svg';
 startSprite($('#turtle').getContext('2d'), turtle, sprite, SIZE);
 startStatus($('#estat'), turtle);
 
-const prefs = { cel: DEFAULT_CELL, quadricula: true, velocitat: 0 };
+const prefs = { cel: DEFAULT_CELL, quadricula: true, velocitat: 0, ...store.get('prefs', {}) };
 prefs.cel = parseCellParam(location.search) ?? prefs.cel;
+const savePrefs = () => store.set('prefs', prefs);
 
 installSpeed(turtle, () => prefs.velocitat);
 $('#velocitat').value = String(prefs.velocitat);
 $('#velocitat').addEventListener('input', e => {
   prefs.velocitat = Number(e.target.value);
+  savePrefs();
 });
 
 const gridCtx = $('#grid').getContext('2d');
@@ -58,16 +66,30 @@ $('#quadricula').checked = prefs.quadricula;
 $('#cel').addEventListener('change', e => {
   prefs.cel = Number(e.target.value);
   redrawGrid();
+  savePrefs();
 });
 $('#quadricula').addEventListener('change', e => {
   prefs.quadricula = e.target.checked;
   redrawGrid();
+  savePrefs();
 });
 
-const logo = new LogoInterpreter(turtle, stream, () => {});
+const logo = new LogoInterpreter(turtle, stream, (name, def) => {
+  const procs = store.get('procs', {});
+  if (def === undefined) delete procs[name];
+  else procs[name] = def;
+  store.set('procs', procs);
+});
 await logo.run('cs');
+for (const def of Object.values(store.get('procs', {}))) {
+  try {
+    await logo.run(def);
+  } catch {
+    // definició desada que ja no és vàlida: se salta
+  }
+}
 
-let history = [];
+let history = store.get('history', []);
 function replaceEditor(code) {
   if (editor.getValue().trim() && !confirm("Vols substituir el contingut de l'editor?")) return false;
   editor.setValue(code);
@@ -78,6 +100,7 @@ function showHistory() {
 }
 function recordHistory(code) {
   history = addEntry(history, code);
+  store.set('history', history);
   showHistory();
 }
 
@@ -92,6 +115,9 @@ const editor = CodeMirror.fromTextArea($('#editor'), {
     'Cmd-Enter': () => runner.run(editor.getValue()),
   },
 });
+editor.setValue(store.get('editor', ''));
+editor.on('change', debounce(() => store.set('editor', editor.getValue()), 500));
+showHistory();
 
 const runner = createRunner(logo, {
   onRun: recordHistory,
@@ -128,6 +154,16 @@ $('#ordre').addEventListener('keydown', e => {
 
 setupTabs($('.pestanyes'), name => {
   if (name === 'editor') editor.refresh();
+});
+
+$('#esborra-tot').addEventListener('click', async () => {
+  if (!confirm("S'esborraran l'editor, els procediments i l'historial. Vols continuar?")) return;
+  store.clearAll();
+  history = [];
+  showHistory();
+  editor.setValue('');
+  await logo.run('erall cs');
+  store.clearAll(); // ERALL torna a cridar el savehook
 });
 
 window.logoApp = { logo, turtle, editor };
