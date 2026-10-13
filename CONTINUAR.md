@@ -4,11 +4,17 @@ Data de l'última sessió: 2026-10-13
 
 ## Estat actual
 
-- ✅ Recerca a GitHub feta: la base és [inexorabletash/jslogo](https://github.com/inexorabletash/jslogo) (Apache 2.0).
-- ✅ Especificació aprovada: `docs/superpowers/specs/2026-10-13-entorn-logo-design.md`
-- ✅ Pla d'implementació escrit: `docs/superpowers/plans/2026-10-13-entorn-logo.md` (10 tasques)
-- ✅ Pla executat (10 tasques) a la branca `feat/entorn-logo`: 72 proves en verd (`npm test`).
-- ⏳ **Pendent:** provar-ho a Firefox i en una tauleta, fusionar a `main` i activar GitHub Pages (vegeu `README.md`).
+L'entorn està acabat i publicat: **https://tomeu-cd100.github.io/logo-aula/**
+
+- ✅ Especificació: `docs/superpowers/specs/2026-10-13-entorn-logo-design.md`
+- ✅ Pla de 10 tasques executat i fusionat a `main` (PR #1).
+- ✅ Problemes menors arreglats (PR #2): Neteja atura l'execució, la velocitat també frena
+  `SETXY`/`HOME`, i les preferències desades es validen.
+- ✅ Repositori públic; GitHub Pages publica des de `main`, carpeta `/`.
+- ✅ Provat a Chrome i Firefox. 82 proves en verd (`npm test`).
+- ⏳ Pendent (opcional): provar-ho en una tauleta real.
+- 💡 Detall conegut, sense efecte a la web: `tests/serve.mjs` (servidor de proves) pot petar
+  amb una URL mal codificada.
 
 ## Decisions preses
 
@@ -19,33 +25,30 @@ Data de l'última sessió: 2026-10-13
 | Accés | GitHub Pages, sense comptes; feina desada al navegador + fitxers `.lgo` |
 | Execució | Editor amb «Executa» + línia d'ordres |
 | Quadrícula | Configurable: 10, 20 o 50 passos (`?cel=`) |
-| Base tècnica | Fork de jslogo sense modificar-lo (a `vendor/`) |
+| Base tècnica | jslogo sense modificar (a `vendor/`); personalització per composició a `js/` |
 
-Mètode d'execució recomanat: **directe** (una sola sessió implementa les 10 tasques i un revisor
-comprova el resultat al final), en lloc de subagents per tasca.
-
-## Passos a l'altre ordinador
+## Com fer canvis
 
 1. Instal·la [Git](https://git-scm.com/), [Node.js](https://nodejs.org/) (versió 22 o superior)
    i [Claude Code](https://claude.com/claude-code).
-2. Clona el repositori:
+2. Clona el repositori (només la primera vegada) i instal·la les eines de prova:
    ```bash
    git clone https://github.com/tomeu-cd100/logo-aula.git
    cd logo-aula
+   npm install
+   npx playwright install chromium
    ```
-3. Obre Claude Code dins la carpeta i escriu:
-   > Llegeix `CONTINUAR.md`. Vull executar el pla `docs/superpowers/plans/2026-10-13-entorn-logo.md`
-   > en mode directe, tasca per tasca.
-4. En acabar cada sessió, desa i puja la feina:
-   ```bash
-   git add -A
-   git commit -m "descripció del que s'ha fet"
-   git push
-   ```
-5. Abans de començar en qualsevol ordinador: `git pull`.
+3. Abans de començar en qualsevol ordinador: `git pull`.
+4. Obre Claude Code dins la carpeta, escriu «Llegeix `CONTINUAR.md`» i explica el canvi que vols.
+5. Prova en local amb `npm start` (http://localhost:8123) i `npm test`.
+6. Publica: qualsevol canvi que arribi a `main` (amb `git push` o fusionant un PR) actualitza la
+   web en un parell de minuts. Si no veus el canvi, recarrega amb **Ctrl+F5**.
 
 ## Fitxers
 
+- `README.md` — instruccions per al docent i per a l'alumnat.
 - `logo.png` — captura de referència de la disposició.
 - `docs/superpowers/specs/` — què es construeix i per què.
-- `docs/superpowers/plans/` — com es construeix, pas a pas, amb codi i proves.
+- `docs/superpowers/plans/` — com es va construir, pas a pas.
+- `js/` — codi propi (un mòdul per peça: quadrícula, tortuga, velocitat, desat…).
+- `manual/primitives.json` — contingut de la pestanya Manual.
