@@ -2,6 +2,7 @@
 
 export function createRunner(logo, { onRun, onStart, onEnd, onError }) {
   let running = 0;
+  let idleWaiters = [];
 
   async function run(code) {
     if (!code.trim()) return;
@@ -19,6 +20,8 @@ export function createRunner(logo, { onRun, onStart, onEnd, onError }) {
         // la següent execució s'aturaria sola.
         logo.forceBye = false;
         onEnd();
+        idleWaiters.forEach(resolve => resolve());
+        idleWaiters = [];
       }
     }
   }
@@ -27,6 +30,10 @@ export function createRunner(logo, { onRun, onStart, onEnd, onError }) {
     run,
     stop() {
       if (running) logo.bye();
+    },
+    // Es resol quan no queda cap execució en marxa (p. ex. després de stop).
+    whenIdle() {
+      return running ? new Promise(resolve => idleWaiters.push(resolve)) : Promise.resolve();
     },
     get running() {
       return running > 0;

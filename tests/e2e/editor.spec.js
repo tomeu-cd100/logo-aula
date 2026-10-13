@@ -64,3 +64,14 @@ test('Ctrl+Enter mentre s\'executa no llança una segona execució', async ({ pa
   await page.click('[data-pestanya="historial"]');
   await expect(page.locator('#historial li')).toHaveCount(1);
 });
+
+test('Neteja durant una execució l\'atura i deixa la tela neta', async ({ page }) => {
+  await obre(page);
+  await posaCodi(page, 'FOREVER [FD 1 RT 1]');
+  await page.click('#executa');
+  await expect(page.locator('#atura')).toBeEnabled();
+  await page.click('#neteja');
+  await expect(page.locator('#executa')).toBeEnabled({ timeout: 2000 });
+  await page.waitForTimeout(300);
+  expect(await posicio(page)).toEqual([0, 0]);
+});

@@ -75,3 +75,13 @@ test('Esborra-ho tot', async ({ page }) => {
   await page.waitForFunction(() => window.logoApp?.ready === true);
   await expect(logo(page, 'salta')).rejects.toThrow();
 });
+
+test('preferències desades no vàlides tornen als valors per defecte', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem('logo-web:prefs', JSON.stringify({ cel: 15, quadricula: 'sí', velocitat: 9 }));
+  });
+  await obre(page);
+  await expect(page.locator('#cel')).toHaveValue('20');
+  await expect(page.locator('#quadricula')).toBeChecked();
+  await expect(page.locator('#velocitat')).toHaveValue('0');
+});
