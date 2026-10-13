@@ -15,3 +15,20 @@ export function installSpeed(turtle, getLevel, sleep = defaultSleep) {
     };
   }
 }
+
+// SETXY, SETPOS, HOME… mouen la tortuga amb un setter, que no es pot esperar:
+// s'embolcalla la rutina de l'intèrpret, que sí que s'espera (logo.routines).
+export function installRoutineSpeed(routines, names, getLevel, sleep = defaultSleep) {
+  for (const name of names) {
+    const original = routines.get(name);
+    if (!original) continue;
+    const wrapped = async function (...args) {
+      const result = await original.apply(this, args);
+      const ms = DELAYS[getLevel()] ?? 0;
+      if (ms) await sleep(ms);
+      return result;
+    };
+    // minimum/default/maximum/primitive: l'intèrpret els llegeix per comptar entrades.
+    routines.set(name, Object.assign(wrapped, original));
+  }
+}

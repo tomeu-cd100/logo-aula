@@ -60,3 +60,22 @@ test('en acabar es neteja forceBye', async () => {
   assert.equal(logo.forceBye, false);
   assert.equal(runner.running, false);
 });
+
+test('whenIdle es resol quan acaba l\'execució', async () => {
+  let release;
+  const logo = fakeLogo();
+  logo.run = () => new Promise(r => { release = r; });
+  const runner = createRunner(logo, hooks());
+  runner.run('FOREVER [FD 1]');
+  let idle = false;
+  const p = runner.whenIdle().then(() => { idle = true; });
+  await new Promise(r => setTimeout(r, 10));
+  assert.equal(idle, false);
+  release();
+  await p;
+  assert.equal(idle, true);
+});
+
+test('whenIdle sense execució es resol de seguida', async () => {
+  await createRunner(fakeLogo(), hooks()).whenIdle();
+});

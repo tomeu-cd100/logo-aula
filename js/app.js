@@ -2,13 +2,14 @@ import { createStream, askDialog, writeError } from './output.js';
 import { createRunner } from './runner.js';
 import { startSprite } from './sprite.js';
 import { startStatus } from './status.js';
-import { installSpeed } from './speed.js';
+import { installSpeed, installRoutineSpeed } from './speed.js';
+import { loadPrefs } from './prefs.js';
 import { addEntry, createRecall, renderHistory } from './history.js';
 import { setupTabs } from './tabs.js';
 import { createStore, debounce } from './store.js';
 import { filterPrimitives, renderManual } from './manual.js';
 import { LGO_NAME, PNG_NAME, isProbablyText, downloadText, downloadDataUrl, composePng } from './files.js';
-import { DEFAULT_CELL, parseCellParam, drawGrid } from './grid.js';
+import { drawGrid } from './grid.js';
 
 const SIZE = 600;
 const $ = sel => document.querySelector(sel);
@@ -36,8 +37,7 @@ sprite.src = 'img/tortuga.svg';
 startSprite($('#turtle').getContext('2d'), turtle, sprite, SIZE);
 startStatus($('#estat'), turtle);
 
-const prefs = { cel: DEFAULT_CELL, quadricula: true, velocitat: 0, ...store.get('prefs', {}) };
-prefs.cel = parseCellParam(location.search) ?? prefs.cel;
+const prefs = loadPrefs(store.get('prefs', {}), location.search);
 const savePrefs = () => store.set('prefs', prefs);
 
 installSpeed(turtle, () => prefs.velocitat);
@@ -82,6 +82,7 @@ const logo = new LogoInterpreter(turtle, stream, (name, def) => {
   else procs[name] = def;
   store.set('procs', procs);
 });
+installRoutineSpeed(logo.routines, ['setxy', 'setx', 'sety', 'setpos', 'home'], () => prefs.velocitat);
 await logo.run('cs');
 for (const def of Object.values(store.get('procs', {}))) {
   try {
@@ -140,7 +141,12 @@ function runEditor() {
 }
 $('#executa').addEventListener('click', runEditor);
 $('#atura').addEventListener('click', () => runner.stop());
-$('#neteja').addEventListener('click', () => logo.run('cs'));
+// Si hi ha un programa en marxa, primer l'atura: si no, continuaria dibuixant.
+$('#neteja').addEventListener('click', async () => {
+  runner.stop();
+  await runner.whenIdle();
+  await logo.run('cs');
+});
 $('#buida-sortida').addEventListener('click', () => { sortida.textContent = ''; });
 
 const recall = createRecall();

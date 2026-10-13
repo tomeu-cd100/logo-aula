@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { installSpeed, DELAYS } from '../../js/speed.js';
+import { installSpeed, installRoutineSpeed, DELAYS } from '../../js/speed.js';
 
 function fakeTurtle() {
   const t = { log: [] };
@@ -34,4 +34,21 @@ test('manté this', async () => {
   installSpeed(t, () => 0, async () => {});
   await t.move(5);
   assert.equal(t.log.length, 1);
+});
+
+test('installRoutineSpeed: espera després de la rutina i conserva les propietats', async () => {
+  const log = [], sleeps = [];
+  const setxy = function (x, y) { log.push(`setxy ${x} ${y}`); };
+  setxy.minimum = setxy.default = setxy.maximum = 2;
+  setxy.primitive = true;
+  const routines = new Map([['setxy', setxy]]);
+  installRoutineSpeed(routines, ['setxy', 'absent'], () => 4, async ms => sleeps.push(ms));
+  const wrapped = routines.get('setxy');
+  assert.equal(wrapped.minimum, 2);
+  assert.equal(wrapped.default, 2);
+  assert.equal(wrapped.primitive, true);
+  await wrapped(10, 20);
+  assert.deepEqual(log, ['setxy 10 20']);
+  assert.deepEqual(sleeps, [DELAYS[4]]);
+  assert.equal(routines.has('absent'), false);
 });
