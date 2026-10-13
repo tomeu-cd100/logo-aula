@@ -6,6 +6,7 @@ import { installSpeed } from './speed.js';
 import { addEntry, createRecall, renderHistory } from './history.js';
 import { setupTabs } from './tabs.js';
 import { createStore, debounce } from './store.js';
+import { LGO_NAME, PNG_NAME, isProbablyText, downloadText, downloadDataUrl, composePng } from './files.js';
 import { DEFAULT_CELL, parseCellParam, drawGrid } from './grid.js';
 
 const SIZE = 600;
@@ -165,6 +166,22 @@ $('#esborra-tot').addEventListener('click', async () => {
   await logo.run('erall cs');
   store.clearAll(); // ERALL torna a cridar el savehook
 });
+
+$('#desa-lgo').addEventListener('click', () => downloadText(LGO_NAME, editor.getValue()));
+$('#obre-lgo').addEventListener('click', () => $('#fitxer-lgo').click());
+$('#fitxer-lgo').addEventListener('change', async e => {
+  const file = e.target.files[0];
+  e.target.value = ''; // permet tornar a obrir el mateix fitxer
+  if (!file) return;
+  const text = await file.text();
+  if (!isProbablyText(text)) {
+    writeError(sortida, `No s'ha pogut obrir «${file.name}»: no és un fitxer de text.`);
+    return;
+  }
+  replaceEditor(text);
+});
+$('#desa-png').addEventListener('click', () =>
+  downloadDataUrl(PNG_NAME, composePng($('#grid'), $('#sandbox'))));
 
 window.logoApp = { logo, turtle, editor };
 window.logoApp.ready = true;
