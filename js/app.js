@@ -3,6 +3,8 @@ import { createRunner } from './runner.js';
 import { startSprite } from './sprite.js';
 import { startStatus } from './status.js';
 import { installSpeed } from './speed.js';
+import { addEntry, createRecall, renderHistory } from './history.js';
+import { setupTabs } from './tabs.js';
 import { DEFAULT_CELL, parseCellParam, drawGrid } from './grid.js';
 
 const SIZE = 600;
@@ -65,6 +67,20 @@ $('#quadricula').addEventListener('change', e => {
 const logo = new LogoInterpreter(turtle, stream, () => {});
 await logo.run('cs');
 
+let history = [];
+function replaceEditor(code) {
+  if (editor.getValue().trim() && !confirm("Vols substituir el contingut de l'editor?")) return false;
+  editor.setValue(code);
+  return true;
+}
+function showHistory() {
+  renderHistory($('#historial'), history, replaceEditor);
+}
+function recordHistory(code) {
+  history = addEntry(history, code);
+  showHistory();
+}
+
 const editor = CodeMirror.fromTextArea($('#editor'), {
   mode: 'logo',
   lineNumbers: true,
@@ -78,7 +94,7 @@ const editor = CodeMirror.fromTextArea($('#editor'), {
 });
 
 const runner = createRunner(logo, {
-  onRun: () => {},
+  onRun: recordHistory,
   onStart: () => {
     $('#executa').disabled = true;
     $('#atura').disabled = false;
@@ -94,6 +110,25 @@ $('#executa').addEventListener('click', () => runner.run(editor.getValue()));
 $('#atura').addEventListener('click', () => runner.stop());
 $('#neteja').addEventListener('click', () => logo.run('cs'));
 $('#buida-sortida').addEventListener('click', () => { sortida.textContent = ''; });
+
+const recall = createRecall();
+$('#ordres').addEventListener('submit', e => {
+  e.preventDefault();
+  const input = $('#ordre');
+  const code = input.value;
+  if (!code.trim()) return;
+  recall.push(code);
+  input.value = '';
+  runner.run(code);
+});
+$('#ordre').addEventListener('keydown', e => {
+  if (e.key === 'ArrowUp') { e.preventDefault(); e.target.value = recall.prev(); }
+  if (e.key === 'ArrowDown') { e.preventDefault(); e.target.value = recall.next(); }
+});
+
+setupTabs($('.pestanyes'), name => {
+  if (name === 'editor') editor.refresh();
+});
 
 window.logoApp = { logo, turtle, editor };
 window.logoApp.ready = true;
