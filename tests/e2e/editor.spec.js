@@ -51,3 +51,16 @@ test('Neteja esborra el traç i torna a l\'origen', async ({ page }) => {
   await page.click('#neteja');
   await expect.poll(() => posicio(page)).toEqual([0, 0]);
 });
+
+test('Ctrl+Enter mentre s\'executa no llança una segona execució', async ({ page }) => {
+  await obre(page);
+  await posaCodi(page, 'FOREVER [FD 1 RT 1]');
+  await page.click('#executa');
+  await expect(page.locator('#atura')).toBeEnabled();
+  await page.click('.CodeMirror');
+  await page.keyboard.press('Control+Enter');
+  await page.click('#atura');
+  await expect(page.locator('#executa')).toBeEnabled({ timeout: 2000 });
+  await page.click('[data-pestanya="historial"]');
+  await expect(page.locator('#historial li')).toHaveCount(1);
+});

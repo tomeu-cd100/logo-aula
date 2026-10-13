@@ -113,8 +113,8 @@ const editor = CodeMirror.fromTextArea($('#editor'), {
   autoCloseBrackets: '[]()',
   lineComment: ';',
   extraKeys: {
-    'Ctrl-Enter': () => runner.run(editor.getValue()),
-    'Cmd-Enter': () => runner.run(editor.getValue()),
+    'Ctrl-Enter': () => runEditor(),
+    'Cmd-Enter': () => runEditor(),
   },
 });
 editor.setValue(store.get('editor', ''));
@@ -134,7 +134,11 @@ const runner = createRunner(logo, {
   onError: message => writeError(sortida, message),
 });
 
-$('#executa').addEventListener('click', () => runner.run(editor.getValue()));
+// Com el botó Executa, que es desactiva: no hi ha execucions superposades.
+function runEditor() {
+  if (!runner.running) runner.run(editor.getValue());
+}
+$('#executa').addEventListener('click', runEditor);
 $('#atura').addEventListener('click', () => runner.stop());
 $('#neteja').addEventListener('click', () => logo.run('cs'));
 $('#buida-sortida').addEventListener('click', () => { sortida.textContent = ''; });
