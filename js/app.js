@@ -1,4 +1,5 @@
-import { createStream, askDialog } from './output.js';
+import { createStream, askDialog, writeError } from './output.js';
+import { createRunner } from './runner.js';
 import { startSprite } from './sprite.js';
 import { startStatus } from './status.js';
 import { DEFAULT_CELL, parseCellParam, drawGrid } from './grid.js';
@@ -57,5 +58,35 @@ $('#quadricula').addEventListener('change', e => {
 const logo = new LogoInterpreter(turtle, stream, () => {});
 await logo.run('cs');
 
-window.logoApp = { logo, turtle };
+const editor = CodeMirror.fromTextArea($('#editor'), {
+  mode: 'logo',
+  lineNumbers: true,
+  matchBrackets: true,
+  autoCloseBrackets: '[]()',
+  lineComment: ';',
+  extraKeys: {
+    'Ctrl-Enter': () => runner.run(editor.getValue()),
+    'Cmd-Enter': () => runner.run(editor.getValue()),
+  },
+});
+
+const runner = createRunner(logo, {
+  onRun: () => {},
+  onStart: () => {
+    $('#executa').disabled = true;
+    $('#atura').disabled = false;
+  },
+  onEnd: () => {
+    $('#executa').disabled = false;
+    $('#atura').disabled = true;
+  },
+  onError: message => writeError(sortida, message),
+});
+
+$('#executa').addEventListener('click', () => runner.run(editor.getValue()));
+$('#atura').addEventListener('click', () => runner.stop());
+$('#neteja').addEventListener('click', () => logo.run('cs'));
+$('#buida-sortida').addEventListener('click', () => { sortida.textContent = ''; });
+
+window.logoApp = { logo, turtle, editor };
 window.logoApp.ready = true;
