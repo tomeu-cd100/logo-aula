@@ -7,7 +7,8 @@ Data de l'última sessió: 2026-10-13
 - ✅ Recerca a GitHub feta: la base és [inexorabletash/jslogo](https://github.com/inexorabletash/jslogo) (Apache 2.0).
 - ✅ Especificació aprovada: `docs/superpowers/specs/2026-10-13-entorn-logo-design.md`
 - ✅ Pla d'implementació escrit: `docs/superpowers/plans/2026-10-13-entorn-logo.md` (10 tasques)
-- ⏳ **Pendent:** revisar el pla i triar com executar-lo. Encara no hi ha codi de l'entorn.
+- ✅ Pla executat (10 tasques) a la branca `feat/entorn-logo`: 72 proves en verd (`npm test`).
+- ⏳ **Pendent:** provar-ho a Firefox i en una tauleta, fusionar a `main` i activar GitHub Pages (vegeu `README.md`).
 
 ## Decisions preses
 
